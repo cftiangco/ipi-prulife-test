@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="h-screen w-full bg-gray-300 flex justify-center items-center">
+        <div class="bg-white px-5 py-16 shadow rounded">
+            <div class="flex flex-col space-y-3 w-72 md:w-fit">
+                <h2 class="font-bold text-blue-400 text-xl mb-4">Login</h2>
+                <div>
+                    <input type="text" placeholder="Username"
+                        class="w-72 md:w-96 bg-gray-100 py-2 px-3 outline-none rounded focus:border-2 focus:border-blue-300 focus:bg-white" />
+                </div>
+                <div>
+                    <input type="password" placeholder="Password"
+                        class="w-72 md:w-96 bg-gray-100 py-2 px-3 outline-none rounded focus:border-2 focus:border-blue-300 focus:bg-white" />
+                </div>
+                <div class="flex justify-end">
+                    <button class="bg-blue-400 px-10 py-1 text-white font-semibold rounded mt-2 hover:bg-blue-300">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

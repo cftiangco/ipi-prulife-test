@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>MyApp</title>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+
+        /* ========= COMPONENTS =========== */
+        const Container = ({ children }) => {
+            return (
+                <div className="h-screen w-full bg-gray-300 flex justify-center items-center">
+                    {children}
+                </div>
+            )
+        }
+
+        const Card = ({ children }) => {
+            return (
+                <div className="bg-white px-5 py-16 shadow rounded">{children}</div>
+            )
+        }
+
+        const Box = ({ children }) => {
+            return (
+                <div className="flex flex-col space-y-3 w-72 md:w-fit">{children}</div>
+            )
+        }
+
+        const TextBox = ({ placeholder, onChange, type }) => {
+            return (
+                <div>
+                    <input
+                        type={type}
+                        placeholder={placeholder}
+                        onChange={onChange}
+                        className="w-72 md:w-96 bg-gray-100 py-2 px-3 outline-none rounded focus:border-2 focus:border-blue-300 focus:bg-white" />
+                </div>
+            )
+        }
+
+        const Button = ({ label, onClick }) => {
+            return (
+                <div className="flex justify-end">
+                    <button
+                        className="bg-blue-400 px-10 py-1 text-white font-semibold rounded mt-2 hover:bg-blue-300"
+                        onClick={onClick}
+                    >{label}</button>
+                </div>
+            )
+        }
+
+        /* SCREENS */
+
+
+        /* MAIN */
+
+        function App() {
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [pages, setPages] = useState('login');
+            const [error, setError] = useState('');
+            
+            const [regUsername,setRegUsername] = useState('');
+            const [regPassword,setRegPassword] = useState('');
+            const [regConfirmPassword,setRegConfirmPassword] = useState('');
+            const [regErrors,setRegErrors] = useState([]);
+
+            const handleOnLogin = () => {
+                setError('');
+                postData('/login', { username, password })
+                    .then((data) => {
+                        if (data?.username) {
+                            console.log(data)
+                            setPages('dashboard');
+                            setUsername('');
+                            setPassword('');
+                        } else {
+                            setError(data.message);
+                        }
+                    })
+            }
+
+            const handleRegister = () => {
+                setRegErrors([]);
+
+                postData('/register', { username:regUsername, password:regPassword})
+                    .then((data) => {
+                        if (data?.token) {
+                            console.log(data)
+                            setRegUsername('');
+                            setRegPassword('');
+                            setRegConfirmPassword('');
+                            setPages('login');
+                        } else {
+                            setError(data.message);
+                        }
+                    });
+            }
+
+            const handleRedirectRegister = () => {
+                setError('');
+                setRegErrors([]);
+                setPages('register');
+            }
+            
+
+            return (
+                <>
+                    {pages === 'login' && <Container>
+                        <Card>
+                            <Box>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="font-bold text-blue-400 text-xl">Login</h2>
+                                    <button
+                                        className="text-sm text-yellow-600 hover:text-yellow-500"
+                                        onClick={handleRedirectRegister}
+                                    >Register Account</button>
+                                </div>
+
+                                {error !== "" ?
+                                    <div className="mb-3">
+                                        <p className="text-red-500">{error}</p>
+                                    </div>
+                                    : null}
+
+
+                                <TextBox
+                                    type="text"
+                                    placeholder="Username"
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                                <TextBox
+                                    type="password"
+                                    placeholder="Password"
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                                <Button
+                                    label="Login"
+                                    onClick={handleOnLogin}
+                                />
+
+                            </Box>
+                        </Card>
+                    </Container>}
+
+                    {pages === 'dashboard' &&
+                        <Container>
+                            <Box>
+                                <h1 className="text-center mb-3">You are now authenticated</h1>
+                                <button
+                                    className="text-white text-sm rounded px-2 py-1 bg-blue-400"
+                                    onClick={() => setPages('login')}
+                                >Back to Login</button>
+                            </Box>
+                        </Container>
+                    }
+
+                    {pages === 'register' &&
+                        <Container>
+                            <Card>
+                                <Box>
+                                    {regErrors.length > 0 ? <ul>
+                                        {regErrors.map((value,key) =>
+                                            <li className="text-red-500" key={key}>{ value }</li>
+                                        )}
+                                    </ul>:null}
+        
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h2 className="font-bold text-blue-400 text-xl">Register</h2>
+                                        <button
+                                            className="text-sm text-yellow-600 hover:text-yellow-500"
+                                            onClick={() => setPages('login')}
+                                        >Back to Login</button>
+                                    </div>
+
+                                    <TextBox
+                                        type="text"
+                                        placeholder="Username"
+                                        onChange={(e) => setRegUsername(e.target.value)}
+                                    />
+                                    <TextBox
+                                        type="password"
+                                        placeholder="Password"
+                                        onChange={(e) => setRegPassword(e.target.value)}
+                                    />
+
+                                    <TextBox
+                                        type="password"
+                                        placeholder="Confirm Password"
+                                        onChange={(e) => setRegConfirmPassword(e.target.value)}
+                                    />
+
+                                    <Button
+                                        label="Register"
+                                        onClick={handleRegister}
+                                    />
+
+                                </Box>
+                            </Card>
+                        </Container>
+                    }
+
+                </>
+            )
+        }
+
+        async function postData(url = '', data = {}) {
+            // Default options are marked with *
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify(data) // body data type must match "Content-Type" header
+            });
+            return response.json(); // parses JSON response into native JavaScript objects
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />)
+    </script>
+
+</body>
+
+</html>
