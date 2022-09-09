@@ -13,7 +13,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const cluster = new couchbase.Cluster('couchbase://localhost', {
+// const cluster = new couchbase.Cluster("couchbase://localhost:8091/", {
+//     username: 'Administrator',
+//     password: 'password'
+// })
+
+const cluster = new couchbase.Cluster("couchbase://database", {
     username: 'Administrator',
     password: 'password'
 })
@@ -26,7 +31,6 @@ app.get('/',(req,res) => {
 });
 
 app.post('/login', async (req, res) => {
-
     if (!req.body.username && !req.body.password) {
         return res.status(401).send({ "message": "`Username` and `Password` are required" });
     } else if (!req.body.username || !req.body.password) {
